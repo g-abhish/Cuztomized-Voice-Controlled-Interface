@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <style>
+        .mic-btn {
+            width: 50px;
+            height: 50px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .mic-btn img {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Customized Voice Controlled Interface</h1>
+    <button class="mic-btn" onclick="startRecognition()">
+        <img src="file:///Users/gundigaabhishek/Downloads/mmmm.jpg" alt="Microphone">
+    </button>
+    <p id="result"></p>
+
+    <script>
+        function startRecognition() {
+            var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-In';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                var transcript = event.results[0][0].transcript;
+                document.getElementById('result').innerText = transcript;
+                sendVoiceCommand(transcript);
+            };
+
+            recognition.onerror = function(event) {
+                console.error(event.error);
+            };
+        }
+
+        function sendVoiceCommand(command) {
+            fetch('/process_command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ command: command })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.response);
+                // You can display the response or handle it as needed
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
